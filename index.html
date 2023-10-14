@@ -4,16 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FundMe</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
 </head>
 <body>
     <h1>FundMe</h1>
-    <div id="app">
-        <p>Amount to Fund (ETH): <input type="number" id="amount" min="0" step="0.01"></p>
-        <button id="fundBtn">Fund</button>
-        <p id="totalFunds">Total Funds: 0 ETH</p>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
-    <script src="app.js"></script>
+    <button id="connect">Connect MetaMask</button>
+    <br><br>
+    <button id="fund">Fund</button>
+    <br><br>
+    <button id="getTotalFunds">Get Total Funds</button>
+    <div id="totalFunds">Total Funds: 0 ETH</div>
+    <br>
+    <button id="withdraw">Withdraw</button>
+    <br><br>
+
+    <script>
+        const CONTRACT_ADDRESS = "CONTRACT_ADDRESS";
+        const ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"funder","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Funded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"uint256","name":"totalAmount","type":"uint256"}],"name":"Withdrawn","type":"event"},{"inputs":[],"name":"getTotalFunds","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getVersion","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"i_owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"addressToAmountFunded","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"fund","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+        let web3;
+        let contract;
+        let account;
+
+        document.getElementById("connect").onclick = async () => {
+            if (window.ethereum) {
+                try {
+                    web3 = new Web3(window.ethereum);
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    account = (await web3.eth.getAccounts())[0];
+                    contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+                } catch (error) {
+                    console.error("Error connecting to MetaMask:", error);
+                }
+            } else {
+                alert("Please install MetaMask to use this dApp!");
+            }
+        };
+
+        document.getElementById("fund").onclick = async () => {
+            if (!contract) {
+                alert("Please connect to MetaMask first!");
+                return;
+            }
+
+            const amount = web3.utils.toWei("0.1", "ether");
+            await contract.methods.fund().send({ from: account, value: amount });
+        };
+
+        document.getElementById("getTotalFunds").onclick = async () => {
+            if (!contract) {
+                alert("Please connect to MetaMask first!");
+                return;
+            }
+
+            const totalFunds = await contract.methods.getTotalFunds().call();
+            document.getElementById("totalFunds").innerText = `Total Funds: ${web3.utils.fromWei(totalFunds, "ether")} ETH`;
+        };
+
+        document.getElementById("withdraw").onclick = async () => {
+            if (!contract) {
+                alert("Please connect to MetaMask first!");
+                return;
+            }
+
+            await contract.methods.withdraw().send({ from: account });
+        };
+    </script>
 </body>
 </html>
