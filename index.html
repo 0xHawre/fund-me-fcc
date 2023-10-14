@@ -2,49 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FundMe</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center my-4">FundMe</h1>
-        <div class="row">
-            <div class="col-md-6">
-                <h3>User Info</h3>
-                <p>Address: <span id="userAddress"></span></p>
-                <p>Balance: <span id="userBalance"></span> ETH</p>
-            </div>
-            <div class="col-md-6">
-                <h3>Fund the Contract</h3>
-                <form id="fundForm">
-                    <div class="mb-3">
-                        <label for="fundAmount" class="form-label">Amount (ETH)</label>
-                        <input type="number" class="form-control" id="fundAmount" step="0.01" min="0">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Fund</button>
-                </form>
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <h3>Contract Info</h3>
-                <p>Address: <span id="contractAddress"></span></p>
-                <p>Balance: <span id="contractBalance"></span> ETH</p>
-            </div>
-            <div class="col-md-6">
-                <h3>Withdraw Funds</h3>
-                <button type="button" class="btn btn-danger" id="withdrawButton">Withdraw</button>
-            </div>
-        </div>
+    <h1>FundMe</h1>
+    <div id="app">
+        <p>Amount to Fund (ETH): <input type="number" id="amount" min="0" step="0.01"></p>
+        <button id="fundBtn">Fund</button>
+        <p id="totalFunds">Total Funds: 0 ETH</p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
-
-
