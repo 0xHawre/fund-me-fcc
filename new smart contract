@@ -32,7 +32,7 @@ contract FundMe {
         emit Funded(msg.sender, msg.value);
     }
     
-    function getVersion() public view returns (uint256){
+    function getVersion() public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
         return priceFeed.version();
     }
@@ -45,7 +45,7 @@ contract FundMe {
     function withdraw() public onlyOwner {
         uint256 totalAmount = address(this).balance;
 
-        for (uint256 funderIndex=0; funderIndex < funders.length; funderIndex++){
+        for (uint256 funderIndex=0; funderIndex < funders.length; funderIndex++) {
             address funder = funders[funderIndex];
             addressToAmountFunded[funder] = 0;
         }
@@ -58,6 +58,10 @@ contract FundMe {
         emit Withdrawn(msg.sender, totalAmount);
     }
 
+    function getTotalFunds() public view returns (uint256) {
+        return address(this).balance;
+    }
+
     fallback() external payable {
         fund();
     }
@@ -65,5 +69,4 @@ contract FundMe {
     receive() external payable {
         fund();
     }
-
 }
