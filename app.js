@@ -1,66 +1,29 @@
-const contractABI = [...]; // Add your contract ABI here
-const contractAddress = '..'; // Add your contract address here
-
-let contract;
-let userAddress;
-
-async function init() {
+window.addEventListener('load', async () => {
     if (window.ethereum) {
         window.web3 = new Web3(window.ethereum);
-        try {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-            userAddress = (await web3.eth.getAccounts())[0];
-            document.getElementById('userAddress').textContent = userAddress;
-
-            const userBalanceWei = await web3.eth.getBalance(userAddress);
-            const userBalance = web3.utils.fromWei(userBalanceWei, 'ether');
-            document.getElementById('userBalance').textContent = userBalance;
-
-            contract = new web3.eth.Contract(contractABI, contractAddress);
-            document.getElementById('contractAddress').textContent = contractAddress;
-
-            const contractBalanceWei = await contract.methods.getContractBalance().call();
-            const contractBalance = web3.utils.fromWei(contractBalanceWei, 'ether');
-            document.getElementById('contractBalance').textContent = contractBalance;
-
-            document.getElementById('fundForm').addEventListener('submit', fundContract);
-            document.getElementById('withdrawButton').addEventListener('click', withdrawFunds);
-        } catch (error) {
-            console.error('User denied account access');
-        }
+        await window.ethereum.enable();
     } else {
-        console.error('No web3 provider detected');
+        alert('Please install MetaMask to use this dApp!');
     }
-}
 
-async function fundContract(event) {
-    event.preventDefault();
-    const fundAmount = document.getElementById('fundAmount').value;
-    const fundAmountWei = web3.utils.toWei(fundAmount, 'ether');
+    const contractABI = []; // Replace with the ABI of your contract
+    const contractAddress = ""; // Replace with the address of your deployed contract
+    const fundMe = new web3.eth.Contract(contractABI, contractAddress);
 
-    await contract.methods.fund().send({ from: userAddress, value: fundAmountWei });
+    document.getElementById('fundBtn').addEventListener('click', async () => {
+        const amount = document.getElementById('amount').value;
+        const accounts = await web3.eth.getAccounts();
+        const weiAmount = web3.utils.toWei(amount, 'ether');
+        
+        await fundMe.methods.fund().send({ from: accounts[0], value: weiAmount });
+        updateTotalFunds();
+    });
 
-    // Update user and contract balances
-    const userBalanceWei = await web3.eth.getBalance(userAddress);
-    const userBalance = web3.utils.fromWei(userBalanceWei, 'ether');
-    document.getElementById('userBalance').textContent = userBalance;
+    async function updateTotalFunds() {
+        const totalFunds = await fundMe.methods.getTotalFunds().call();
+        const totalFundsEth = web3.utils.fromWei(totalFunds, 'ether');
+        document.getElementById('totalFunds').innerText = `Total Funds: ${totalFundsEth} ETH`;
+    }
 
-    const contractBalanceWei = await contract.methods.getContractBalance().call();
-    const contractBalance = web3.utils.fromWei(contractBalanceWei, 'ether');
-    document.getElementById('contractBalance').textContent = contractBalance;
-}
-
-async function withdrawFunds() {
-    await contract.methods.withdraw().send({ from: userAddress });
-
-    // Update user and contract balances
-    const userBalanceWei = await web3.eth.getBalance(userAddress);
-    const userBalance = web3.utils.fromWei(userBalanceWei, 'ether');
-    document.getElementById('userBalance').textContent = userBalance;
-
-    const contractBalanceWei = await contract.methods.getContractBalance().call();
-    const contractBalance = web3.utils.fromWei(contractBalanceWei, 'ether');
-    document.getElementById('contractBalance').textContent = contractBalance;
-}
-
-window.addEventListener('load', init);
+    updateTotalFunds();
+});
